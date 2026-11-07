@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+<meta name="theme-color" content="#1a120c" />
+<title>ХЛЕБ — симулятор пекарни</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<canvas id="scene"></canvas>
+<div id="grade"></div>
+
+<!-- ================= HUD ================= -->
+<div id="hud" class="hidden">
+  <div id="moneyBox"><span class="cur">$</span><span id="moneyVal">0</span></div>
+  <div id="lvlBox">ПЕКАРНЯ · УР. <b id="lvlVal">1</b></div>
+
+  <div id="objective">
+    <div class="obj-k">ЦЕЛЬ</div>
+    <div class="obj-t" id="objectiveText">Возьми тесто</div>
+    <div class="obj-s" id="objectiveSub">коробка на столе · зажми ЛКМ</div>
+  </div>
+
+  <div id="kneadBox" class="hidden">
+    <div class="k-row"><span>ТЕСТО</span><span id="kneadPct">0%</span></div>
+    <div class="k-track"><div id="kneadFill"></div></div>
+    <div class="k-hint" id="kneadHint">зажми МЯТЬ</div>
+  </div>
+
+  <div id="context" class="hidden"><b id="ctxKey">E</b><span id="ctxText">действие</span></div>
+
+  <div id="combo"></div>
+  <div id="hint"></div>
+  <button id="btnPause" class="icon-btn hidden">❚❚</button>
+</div>
+
+<!-- ================= ПЕЧЬ ================= -->
+<div id="bakePanel" class="hidden">
+  <div class="bp-head">ПЕЧЬ</div>
+  <div class="gauge">
+    <div class="band" id="gaugeBand"></div>
+    <div class="needle" id="needle"></div>
+  </div>
+  <div class="bp-row"><span>ТЕМПЕРАТУРА</span><b id="tempVal">0%</b></div>
+  <div class="bp-track"><div id="bakeFill"></div></div>
+  <div class="bp-q">ХЛЕБ <b id="bakeQ">—</b></div>
+  <div class="bp-hint" id="bakeHint">держи в зелёной зоне</div>
+</div>
+
+<!-- ================= СТАРТ ================= -->
+<div id="start" class="screen">
+  <div class="start-inner">
+    <div class="start-kicker">симулятор пекарни</div>
+    <h1 class="start-title">ХЛЕБ</h1>
+    <div class="start-sub">тесто&nbsp;&nbsp;·&nbsp;&nbsp;руки&nbsp;&nbsp;·&nbsp;&nbsp;печь&nbsp;&nbsp;·&nbsp;&nbsp;прокачка</div>
+    <div class="start-btns">
+      <button id="btnStart" class="btn primary">ИГРАТЬ</button>
+      <button id="btnHow" class="btn">КАК ИГРАТЬ</button>
+    </div>
+    <div class="start-foot">бесконечная игра · ПК и телефон</div>
+  </div>
+</div>
+
+<!-- ================= КАК ИГРАТЬ ================= -->
+<div id="how" class="screen hidden">
+  <div class="panel">
+    <div class="panel-k">управление</div>
+    <h2 class="panel-t">КАК ИГРАТЬ</h2>
+    <div class="how-grid">
+      <div><b>МЫШЬ</b><span>крутить головой</span></div>
+      <div><b>WASD</b><span>ходить</span></div>
+      <div><b>ЛКМ</b><span>держать, чтобы взять / нести</span></div>
+      <div><b>ПКМ</b><span>держать, чтобы мять и жать</span></div>
+      <div><b>E</b><span>положить в печь / продать</span></div>
+      <div><b>TAB</b><span>мастерская (прокачка)</span></div>
+    </div>
+    <p class="how-text">Мни тесто, пока индикатор не заполнится. Потом неси в печь и держи температуру в зелёной зоне. Готовый хлеб отнеси на прилавок.</p>
+    <p class="how-text dim">На телефоне: левый джойстик — ходьба, свайп справа — обзор, кнопки ВЗЯТЬ и МЯТЬ.</p>
+    <button class="btn back" id="btnHowBack">НАЗАД</button>
+  </div>
+</div>
+
+<!-- ================= МАСТЕРСКАЯ ================= -->
+<div id="shop" class="screen hidden">
+  <div class="panel wide">
+    <div class="shop-head">
+      <div>
+        <div class="panel-k">прокачка</div>
+        <h2 class="panel-t">МАСТЕРСКАЯ</h2>
+      </div>
+      <div class="shop-money">$<span id="shopMoney">0</span></div>
+    </div>
+    <div id="shopCards" class="shop-cards"></div>
+    <button class="btn back" id="btnShopClose">ЗАКРЫТЬ</button>
+  </div>
+</div>
+
+<!-- ================= ПАУЗА ================= -->
+<div id="pause" class="screen hidden">
+  <div class="panel small">
+    <div class="panel-k">пауза</div>
+    <h2 class="panel-t">ПЕРЕРЫВ</h2>
+    <button class="btn primary" id="btnResume">ПРОДОЛЖИТЬ</button>
+    <button class="btn" id="btnPauseShop">МАСТЕРСКАЯ</button>
+    <button class="btn" id="btnPauseRestart">НАЧАТЬ ЗАНОВО</button>
+  </div>
+</div>
+
+<!-- ================= ТЕЛЕФОН ================= -->
+<div id="touch" class="hidden">
+  <div id="stick"><div id="stickKnob"></div></div>
+  <div id="touchBtns">
+    <button id="btnGrab" class="tbtn">ВЗЯТЬ</button>
+    <button id="btnPress" class="tbtn press">МЯТЬ</button>
+  </div>
+  <button id="btnAct" class="tbtn act hidden">E</button>
+</div>
+
+<div id="toast"></div>
+<div id="fade"></div>
+<div id="loading">
+  <div class="load-t">ХЛЕБ</div>
+  <div class="load-track"><div id="loadFill"></div></div>
+  <div class="load-s">печь разогревается…</div>
+</div>
+
+<script src="three.min.js"></script>
+<script src="js/util.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/world.js"></script>
+<script src="js/dough.js"></script>
+<script src="js/hands.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
